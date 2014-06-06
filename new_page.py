@@ -6,7 +6,7 @@ class ManPageNewCommand(sublime_plugin.WindowCommand):
         v = self.window.new_file()
         v.settings().set('default_dir',
             os.path.join(sublime.packages_path(), 'User'))
-        v.set_syntax_file('Packages/ManPage/man-groff.tmLanguage')
+        v.set_syntax_file('Packages/sublime_man_page_support/man-groff.tmLanguage')
 
         template = """.\" Manpage for ${1:<COMMAND>}.
 .\" Contact ${2:<AUTHOR_EMAIL>} to correct errors or typos.
