@@ -2,6 +2,8 @@ import sublime, sublime_plugin
 import os, time
 import subprocess
 
+from sublime_lib.path import root_at_packages, get_package_name
+
 class ManPagePreview(sublime_plugin.WindowCommand):
     def run(self):
 	# exit if file is dirty, we can't run a man command against a file that doesn't exist
@@ -22,7 +24,8 @@ class ManPagePreview(sublime_plugin.WindowCommand):
 
         # write clean output to new window
         v = self.window.new_file()
-        v.set_syntax_file('Packages/sublime_man_page_support/man-preview.tmLanguage')
+        v.settings().set('default_dir', root_at_packages('User'))
+        v.set_syntax_file('Packages/Man Page Support/man-preview.tmLanguage')
         e = v.begin_edit()
         p = v.text_point(0,0)
         v.insert(e, p, cleanout)
@@ -31,9 +34,8 @@ class ManPagePreview(sublime_plugin.WindowCommand):
 class ManPageNewCommand(sublime_plugin.WindowCommand):
     def run(self):
         v = self.window.new_file()
-        v.settings().set('default_dir',
-            os.path.join(sublime.packages_path(), 'User'))
-        v.set_syntax_file('Packages/sublime_man_page_support/man-groff.tmLanguage')
+        v.settings().set('default_dir', root_at_packages('User'))
+        v.set_syntax_file('Packages/Man Page Support/man-groff.tmLanguage')
 
         template = """.\\\" Manpage for ${1:<COMMAND>}.
 .\\\" Contact ${2:<AUTHOR_EMAIL>} to correct errors or typos.
