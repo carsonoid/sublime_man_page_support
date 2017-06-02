@@ -1,4 +1,4 @@
-#Sublime Man Page Support
+# Sublime Man Page Support
 
 Sublime Text 2 Support for Unix style manual pages.
 
