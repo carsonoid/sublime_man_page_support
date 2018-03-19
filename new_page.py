@@ -1,12 +1,12 @@
-import sublime, sublime_plugin
-import os, time
 import subprocess
+import time
 
-from sublime_lib.path import root_at_packages, get_package_name
+import sublime_plugin
+
 
 class ManPagePreview(sublime_plugin.WindowCommand):
     def run(self):
-	# exit if file is dirty, we can't run a man command against a file that doesn't exist
+        # exit if file is dirty, we can't run a man command against a file that doesn't exist
         if self.window.active_view().is_dirty():
             o = self.window.get_output_panel("manfail")
             o.run_command("insert_snippet", {"contents": "Unable to preview unsaved file."})
@@ -24,17 +24,13 @@ class ManPagePreview(sublime_plugin.WindowCommand):
 
         # write clean output to new window
         v = self.window.new_file()
-        v.settings().set('default_dir', root_at_packages('User'))
         v.set_syntax_file('Packages/Man Page Support/Man Page Preview/man-preview.tmLanguage')
-        e = v.begin_edit()
-        p = v.text_point(0,0)
-        v.insert(e, p, cleanout)
-        v.end_edit(e)
+        v.run_command('insert', {'characters': cleanout})
+
 
 class ManPageNewCommand(sublime_plugin.WindowCommand):
     def run(self):
         v = self.window.new_file()
-        v.settings().set('default_dir', root_at_packages('User'))
         v.set_syntax_file('Packages/Man Page Support/man-groff.tmLanguage')
 
         template = """.\\\" Manpage for ${1:<COMMAND>}.
@@ -55,5 +51,5 @@ No known bugs.
 .MT ${2:<AUTHOR_EMAIL>}
 ${3:<AUTHOR_NAME>}
 .ME
-""" %(time.strftime("%B %Y"))
+""" % (time.strftime("%B %Y"))
         v.run_command("insert_snippet", {"contents": template})
