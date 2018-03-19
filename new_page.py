@@ -25,7 +25,7 @@ class ManPagePreview(sublime_plugin.WindowCommand):
         # write clean output to new window
         v = self.window.new_file()
         v.settings().set('default_dir', root_at_packages('User'))
-        v.set_syntax_file('Packages/Man Page Support/man-preview.tmLanguage')
+        v.set_syntax_file('Packages/Man Page Support/Man Page Preview/man-preview.tmLanguage')
         e = v.begin_edit()
         p = v.text_point(0,0)
         v.insert(e, p, cleanout)

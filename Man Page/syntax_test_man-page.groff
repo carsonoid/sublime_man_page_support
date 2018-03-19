@@ -1,0 +1,96 @@
+\" SYNTAX TEST "Packages/Man Page Support/Man Page/Man Page.sublime-syntax"
+
+.\" comment
+\" <- comment.line.other.groff punctuation.definition.comment.begin.groff
+ \" <- comment.line.other.groff punctuation.definition.comment.begin.groff
+\" ^^^^^^^^ comment.line.other.groff
+
+  .\" comment
+\"^ - comment
+\" ^^^^^^^^^^^ comment.line.other.groff
+\" ^^ punctuation.definition.comment.begin.groff
+
+\# comment
+\" ^^^^^^^^ comment.line.other.groff
+
+.   TH TITLE 3 2018-03-18 "Source" "Manual Name"
+\" <- keyword.control.flow.command.groff
+\"  ^^ storage.type.title.groff
+\"     ^^^^^ entity.name.section.title.groff
+\"           ^ constant.numeric.integer.groff
+\"             ^^^^^^^^^^ constant.other.date.groff
+\"                        ^^^^^^^^ string.quoted.double.groff
+\"                                 ^^^^^^^^^^^^^ string.quoted.double.groff
+
+.   SH SECTION NAME
+\"  ^^ storage.type.section.groff
+\"     ^^^^^^^^^^^^ entity.name.section.groff
+
+    \fIitalic\fR \fBbold\fR normal
+\"  ^^^ storage.modifier.font.groff
+\"     ^^^^^^ markup.italic.groff
+\"           ^^^ storage.modifier.font.groff
+\"               ^^^ storage.modifier.font.groff
+\"                  ^^^^ markup.bold.groff
+\"                      ^^^ storage.modifier.font.groff
+\"                          ^ - markup
+
+    \(dq \e \[escape]
+\"  ^^^^ constant.character.escape.groff
+\"       ^^ constant.character.escape.groff
+\"          ^^^^^^^^^ constant.character.escape.groff
+
+.SH SYNOPSIS
+.SY aur foo
+ \" <- keyword.control.flow.synopsis.groff
+\"  ^^^ markup.bold.groff
+\"      ^^^ invalid.illegal.redundant.groff
+.B build
+\" ^^^^ markup.bold.groff
+.I \-d database
+\" ^^ constant.character.escape.groff
+\" ^^^^^^^^^^^^ markup.italic.groff
+.OP \-cfNRsv
+\"  ^^ constant.character.escape.groff
+\"  ^^^^^^^^ markup.bold.groff
+.OP \-a queue
+\"  ^^^ markup.bold.groff
+\"      ^^^^^ markup.italic.groff
+[\fImakepkg args\fR]
+\"  ^^^^^^^^^^^^ markup.italic.groff
+.YS
+ \" <- keyword.control.flow.groff
+
+
+.EX
+
+\" <- markup.raw.block.groff
+    some code be here
+
+\" <- markup.raw.block.groff
+.EE
+\" <- - markup.raw.block.groff
+
+.IR "Where a traditional heading would apply" ", " "please use it" ;
+\"  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ markup.italic.groff meta.string.groff
+\"                                            ^^^^ meta.string.groff - markup
+\"                                                 ^^^^^^^^^^^^^^^ markup.italic.groff meta.string.groff
+\"                                                                 ^ - meta.string.groff - markup
+
+.BR man-pages (7)
+\"  ^^^^^^^^^ markup.bold.groff
+\"            ^^^ - markup
+
+.RB (7) man-pages regular
+\"  ^^^ - markup
+\"      ^^^^^^^^^ markup.bold.groff
+\"                ^^^^^^^ - markup
+.RI ab "cde fg" hi j
+\"  ^^ - markup
+\"     ^^^^^^^^ markup.italic.groff meta.string.groff
+\"              ^^ - markup
+\"                 ^ markup.italic.groff
+
+.PP redundant
+ \" <- keyword.operator.word.groff
+\"  ^^^^^^^^^ invalid.illegal.groff
