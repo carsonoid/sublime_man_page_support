@@ -1,0 +1,336 @@
+%YAML 1.2
+# Sources:
+#   - man(7)
+#   - man-pages(7)
+#   - groff(7)
+---
+name: Man Page (groff/troff)
+scope: text.groff
+file_extensions: [man, groff, troff, '1', '2', '3', '4', '5', '6', '7']
+
+contexts:
+  main:
+    - include: commands
+    - include: text
+
+  commands:
+    - match: ^[\.'']\\"
+      scope: punctuation.definition.comment.begin.groff
+      push:
+        - meta_scope: comment.line.other.groff
+        - include: text
+        - match: $\n?
+          pop: true
+    - match: ^[.']
+      scope: keyword.control.flow.command.groff
+      push:
+        # .TH title section date source manual
+        - match: (?i)TH\b
+          scope: storage.type.title.groff
+          set: [string-pop, string-pop, date-pop, integer-pop, title-pop]
+        # .SH section
+        - match: (?i)(SH)\b\s*
+          captures:
+            1: storage.type.section.groff
+          set:
+            - meta_content_scope: entity.name.section.groff
+            - include: text
+            - match: \s*$
+              pop: true
+        # .SS sub-section
+        - match: (?i)(SS)\b\s*
+          captures:
+            1: storage.type.section.groff
+          set:
+            - meta_content_scope: entity.name.section.sub.groff
+            - include: text
+            - match: \s*$
+              pop: true
+        # .SY cmdname
+        - match: (?i)(SY)\b\s*
+          captures:
+            1: keyword.control.flow.synopsis.groff
+          set:
+            - meta_content_scope: markup.bold.groff
+            - include: argument
+            - include: text
+            - match: $
+              pop: true
+            - match: ' +'
+              push:
+                - clear_scopes: 1
+                - meta_content_scope: invalid.illegal.redundant.groff
+                - match: $
+                  pop: true
+        # font stuff
+        - include: font-commands
+        # .EX raw text
+        - match: (?i)(EX)\b
+          scope: keyword.control.flow.raw.groff
+          set:
+            - match: ^
+              set:
+                - meta_content_scope: markup.raw.block.groff
+                - match: (?i)(?=^[.']EE\b)
+                  pop: true
+        # new paragraphs
+        - match: (?i)(P|PP|LP)\b
+          scope: keyword.operator.word.groff
+          set:
+            - match: $
+              pop: true
+            - match: \S+
+              scope: invalid.illegal.groff
+        # other flow commands, most for indenting
+        # indenting commands, scoped as operators here to distinguish
+        - match: (?i)(YS|EE|RS|RE|IP|TP)\b
+          scope: keyword.control.flow.groff
+          set:
+            - include: text
+            - match: $
+              pop: true
+        # other commands
+        - match: \w+|\.(?=\s|$)
+          scope: keyword.other.groff
+          set:
+            - include: text
+            - match: $
+              pop: true
+
+  font-commands:
+    # all bold
+    - match: (?i)(B)\b\s*
+      captures:
+        1: storage.modifier.font.groff
+      set:
+        - meta_content_scope: markup.bold.groff
+        - include: text
+        - match: $
+          pop: true
+    # odd: bold, even: regular
+    - match: (?i)(BR)\b\s*
+      captures:
+        1: storage.modifier.font.groff
+      set:
+        - meta_content_scope: markup.bold.groff
+        - include: argument
+        - include: text
+        - match: $
+          pop: true
+        - match: ' +'
+          push:
+            - clear_scopes: 1
+            - match: ' +'
+              pop: true
+            - include: argument
+            - include: text
+            - match: $
+              pop: true
+    # odd: regular, even: bold
+    - match: (?i)(RB|SB)\b\s*
+      captures:
+        1: storage.modifier.font.groff
+      set:
+        - include: argument
+        - include: text
+        - match: $
+          pop: true
+        - match: ' +'
+          push:
+            - meta_content_scope: markup.bold.groff
+            - match: ' +'
+              pop: true
+            - include: argument
+            - include: text
+            - match: $
+              pop: true
+    # all italics
+    - match: (?i)(I)\b\s*
+      captures:
+        1: storage.modifier.font.groff
+      set:
+        - meta_content_scope: markup.italic.groff
+        - include: text
+        - match: $
+          pop: true
+    # odd: italics, even: regular
+    - match: (?i)(IR)\b\s*
+      captures:
+        1: storage.modifier.font.groff
+      set:
+        - meta_content_scope: markup.italic.groff
+        - include: argument
+        - include: text
+        - match: $
+          pop: true
+        - match: ' +'
+          push:
+            - clear_scopes: 1
+            - match: ' +'
+              pop: true
+            - include: argument
+            - include: text
+            - match: $
+              pop: true
+    # odd: regular, even: italics
+    - match: (?i)(RI)\b\s*
+      captures:
+        1: storage.modifier.font.groff
+      set:
+        - include: argument
+        - include: text
+        - match: $
+          pop: true
+        - match: ' +'
+          push:
+            - meta_content_scope: markup.italic.groff
+            - match: ' +'
+              pop: true
+            - include: argument
+            - include: text
+            - match: $
+              pop: true
+    # odd: bold, even: italics
+    - match: (?i)(OP|BI)\b\s*
+      captures:
+        1: storage.modifier.font.groff
+      set:
+        - meta_content_scope: markup.bold.groff
+        - include: argument
+        - include: text
+        - match: $
+          pop: true
+        - match: ' '
+          set:
+            - meta_content_scope: markup.italic.groff
+            - include: argument
+            - include: text
+            - match: $
+              pop: true
+
+  text:
+    - match: \\["#]
+      scope: punctuation.definition.comment.begin.groff
+      push:
+        - meta_scope: comment.line.other.groff
+        - include: text
+        - match: $\n?
+          pop: true
+    - match: \\\[
+      push:
+        - meta_scope: constant.character.escape.groff
+        - match: \]
+          pop: true
+        - match: $\n?
+          scope: invalid.illegal.unclosed-escape.groff
+          pop: true
+    - match: \\\(..
+      scope: constant.character.escape.groff
+    - match: \\fB
+      scope: storage.modifier.font.groff
+      push:
+        - meta_content_scope: markup.bold.groff
+        - match: (?=\\f.)
+          pop: true
+        - include: text
+    - match: \\fI
+      scope: storage.modifier.font.groff
+      push:
+        - meta_content_scope: markup.italic.groff
+        - match: (?=\\f.)
+          pop: true
+        - include: text
+    - match: \\f.
+      scope: storage.modifier.font.groff
+    - match: \\n # TODO
+    - match: \\[-e& |^h]
+      scope: constant.character.escape.groff
+    - match: \\$
+      scope: punctuation.separator.line-continuation.groff
+    - match: \\[*$YVfFgkmM]\((..)
+      scope: constant.character.escape.groff
+      captures:
+        1: variable.other.groff
+    - match: \\[*$YVfFgkmM](.)
+      scope: constant.character.escape.groff
+      captures:
+        1: variable.other.groff
+    - match: \\[*$YVfFgkmM]\[
+      scope: constant.character.escape.groff
+      push:
+        - meta_content_scope: variable.other.groff
+        - match: \]
+          pop: true
+        - match: $\n?
+          scope: invalid.illegal.unclosed-escape.groff
+          pop: true
+    # - match: \\\[u(?i)[\da-f]{4,5}(?:_[\da-f]{4,5}){0,2}\]
+    #   scope: constant.character.escape.groff
+    - match: \\.
+      scope: constant.character.escape.groff
+
+  title-pop:
+    - match: $
+      pop: true
+    - match: '"'
+      scope: punctuation.definition.string.begin.groff
+      set:
+        - meta_scope: string.quoted.double.groff
+        - meta_content_scope: entity.name.section.title.groff
+        - match: \n
+          scope: invalid.illegal.unclosed-string.groff
+          pop: true
+        - match: '"'
+          scope: punctuation.definition.string.end.groff
+          pop: true
+    # title should be upper case
+    - match: \S+
+      scope: entity.name.section.title.groff
+      pop: true
+
+  argument:
+    - match: '"'
+      scope: punctuation.definition.string.begin.groff
+      push:
+        - meta_scope: meta.string.groff  # no string highlighting here
+        - match: \n
+          scope: invalid.illegal.unclosed-string.groff
+          pop: true
+        - match: '"'
+          scope: punctuation.definition.string.end.groff
+          pop: true
+
+  string-pop:
+    - match: $
+      pop: true
+    - match: '"'
+      scope: punctuation.definition.string.begin.groff
+      set:
+        - meta_scope: string.quoted.double.groff
+        - match: \n
+          scope: invalid.illegal.unclosed-string.groff
+          pop: true
+        - match: '"'
+          scope: punctuation.definition.string.end.groff
+          pop: true
+    - match: \S+
+      scope: string.unquoted.groff
+      pop: true
+
+  date-pop:
+    - match: $
+      pop: true
+    - match: '[\d/-]+'
+      scope: constant.other.date.groff
+      pop: true
+    - match: (?=\S)
+      pop: true
+
+  integer-pop:
+    - match: $
+      pop: true
+    - match: \d+
+      scope: constant.numeric.integer.groff
+      pop: true
+    - match: (?=\S)
+      pop: true
